@@ -3,7 +3,7 @@
 
 <img width="1353" height="641" alt="d home" src="https://github.com/user-attachments/assets/44de7962-a1d6-4af9-8e15-5a0d5532bc63" />
 <img width="1349" height="641" alt="d create" src="https://github.com/user-attachments/assets/b3e5f934-8c61-46d9-85c0-6b16d6909334" />
-<img width="1350" height="640" alt="d entries" src="https://github.com/user-attachments/assets/0b7a71b6-cfe0-4c2d-843e-b74d6b4a8ce5" />
+<img width="1352" height="634" alt="d entries" src="https://github.com/user-attachments/assets/ce6ffaf8-a59c-4983-9262-1a5eb5a84d74" />
 <img width="1357" height="641" alt="d entries-list" src="https://github.com/user-attachments/assets/c60a917c-0149-4004-8cb8-7616f1ecd0b8" />
 
 ### Project Overview

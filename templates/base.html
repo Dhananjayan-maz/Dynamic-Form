@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Dynamic Forms{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f5f7fb;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .changa-one-regular {
+            font-family: "Changa One", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .changa-one-regular-italic {
+            font-family: "Changa One", sans-serif;
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        /* ================= NAVBAR ================= */
+        .navbar {
+            background: linear-gradient(180deg, #a8b4eb, #8d4dce);
+            border-radius: 100px;
+            padding: 12px 25px;
+            margin: 10px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(141, 77, 206, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar a,
+        .navbar span {
+            color: #fff !important;
+            font-family: "Lexend", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 500;
+            font-style: normal;
+
+        }
+
+        /* Animated gradient background */
+        .navbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.1),
+                    transparent);
+            transition: left 0.7s ease;
+            border-radius: 100px;
+        }
+
+        .navbar:hover::before {
+            left: 100%;
+        }
+
+        /* Logo/Brand animation */
+        .navbar-brand {
+            font-weight: 700;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 5px 0;
+        }
+
+        .navbar-brand::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: white;
+            transition: width 0.3s ease;
+        }
+
+        .navbar-brand:hover::after {
+            width: 100%;
+        }
+
+        .navbar-brand:hover {
+            transform: translateY(-2px);
+            text-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Nav items animation */
+        .navbar-nav .nav-item {
+            position: relative;
+            margin: 0 5px;
+        }
+
+        .navbar-nav .nav-link {
+            padding: 8px 20px !important;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar-nav .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.2),
+                    transparent);
+            transition: left 0.5s ease;
+            border-radius: 50px;
+        }
+
+        .navbar-nav .nav-link:hover::before {
+            left: 100%;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Auth buttons animation */
+        .navbar .btn-outline-light,
+        .navbar .btn-light {
+            border-radius: 50px;
+            padding: 8px 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+
+        .navbar .btn-outline-light {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .navbar .btn-outline-light:hover {
+            border-color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .navbar .btn-light {
+            background: white;
+            color: #8d4dce !important;
+        }
+
+        .navbar .btn-light:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .logout-btn:hover {
+            background: white !important;
+            color: #8d4dce !important;
+            transform: translateY(-2px);
+        }
+
+        /* User greeting animation */
+
+        .navbar span.me-3 {
+            transition: all 0.3s ease;
+            padding: 5px 15px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+
+        }
+
+        .navbar span.me-3:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+            color: #a8b4eb;
+        }
+
+        /* Mobile menu toggle button */
+        .navbar-toggler {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 6px 12px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-toggler:hover {
+            border-color: white;
+            transform: rotate(90deg);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Mobile menu collapse animation */
+        .navbar-collapse {
+            transition: all 0.4s ease;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .navbar {
+                border-radius: 30px;
+                padding: 15px;
+            }
+
+            .navbar-nav {
+                text-align: center;
+                padding: 20px 0;
+            }
+
+            .navbar-nav .nav-item {
+                margin: 8px 0;
+            }
+
+            .navbar-nav .nav-link {
+                display: inline-block;
+                min-width: 200px;
+            }
+
+            .navbar::before {
+                border-radius: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                border-radius: 25px;
+                margin: 8px;
+            }
+
+            .navbar::before {
+                border-radius: 25px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar {
+                border-radius: 20px;
+                padding: 12px;
+            }
+
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+
+            .navbar::before {
+                border-radius: 20px;
+            }
+        }
+
+        /* Active link indicator */
+        .navbar-nav .nav-item.active .nav-link {
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+        }
+
+        /* Fade-in animation for navbar items */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .navbar-nav .nav-item {
+            animation: fadeInDown 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .navbar-nav .nav-item:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .navbar-nav .nav-item:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .navbar-nav .nav-item:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        /* Smooth hover effects for all interactive elements */
+        .navbar a,
+        .navbar button,
+        .navbar span {
+            transition: all 0.3s ease !important;
+        }
+
+        /* ================= MAIN ================= */
+        .main-content {
+            background: #fff;
+            margin: 10px;
+            padding: 25px;
+            border-radius: 12px;
+            min-height: calc(100vh - 140px);
+        }
+
+        footer {
+            margin: 10px;
+            border-radius: 12px;
+            background: #fff;
+            border-top: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+
+<body data-csrf="{{ csrf_token }}">
+
+    <!-- ================= NAVBAR ================= -->
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand fw-bold" href="{% url 'home' %}">
+            DynamicForms
+        </a>
+
+        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav me-auto ms-5 d-flex align-items-center justify-content-evenly">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}">Home</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'create_form' %}">Build Form</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'entries_list' %}">Your Forms</a>
+                </li>
+            </ul>
+
+
+            <!-- ===== AUTH BUTTONS ===== -->
+            <div class="d-flex align-items-center">
+                {% if request.user.is_authenticated %}
+                <span class="me-3">Hi, {{ request.user.username }}</span>
+                <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm logout-btn">
+                    Logout
+                </a>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm me-2">
+                    Login
+                </a>
+                <a href="{% url 'signup' %}" class="btn btn-light btn-sm">
+                    Signup
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+    </nav>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="text-center py-3">
+        <small class="text-muted">
+            © Dynamic Forms · Built with Django
+        </small>
+    </footer>
+
+    <!-- ================= DELETE MODAL ================= -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Confirm Delete
+                    </h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    Are you sure you want to delete this form?
+                    <br>
+                    <small class="text-muted">This action cannot be undone.</small>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button class="btn btn-danger" id="confirmDeleteBtn">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= JS ================= -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let deleteFormId = null;
+        const deleteModal = new bootstrap.Modal(
+            document.getElementById("deleteConfirmModal")
+        );
+
+        document.addEventListener("click", function (e) {
+            const btn = e.target.closest(".delete-form-btn");
+            if (btn) {
+                deleteFormId = btn.dataset.formId;
+                deleteModal.show();
+            }
+        });
+
+        document.getElementById("confirmDeleteBtn").onclick = () => {
+            fetch(`/forms/${deleteFormId}/delete/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": document.body.dataset.csrf,
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = "{% url 'create_form' %}";
+                    }
+                });
+        };
+    </script>
+
+    <!-- jQuery (MUST be first) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- DataTables core -->
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+    <!-- DataTables Buttons -->
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+
+    <!-- Export dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+    <!-- Export buttons -->
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+
+</html>

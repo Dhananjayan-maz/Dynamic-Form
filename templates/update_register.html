@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Update Entry{% endblock %}
+
+{% block content %}
+
+<style>
+    .card-header{
+        background-color: #8d4dce;
+        color: aliceblue;
+    }
+</style>
+
+<div class="container mt-4">
+
+    <div class="card shadow-sm">
+        <div class="card-header p-3">
+            <h5 class="mb-0">
+                Update Entry – {{ form_def.title }}
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% for field in fields %}
+                <div class="mb-3">
+                    <label class="form-label">{{ field.label }}</label>
+
+                    {% if field.field_type == "textarea" %}
+                    <textarea name="field_{{ field.id }}" class="form-control">{{ field.value }}</textarea>
+
+                    {% elif field.field_type == "select" %}
+                    <select name="field_{{ field.id }}" class="form-control">
+                        <option value="">-- Select --</option>
+                        {% for choice in field.choices %}
+                        <option value="{{ choice }}" {% if choice == field.value %}selected{% endif %}>
+                            {{ choice }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                    {% elif field.field_type == "radio" %}
+                    {% for choice in field.choices %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="field_{{ field.id }}" value="{{ choice }}" 
+                        {% if choice == field.value %}checked{% endif %}>
+                        <label class="form-check-label">{{ choice }}</label>
+                    </div>
+                    {% endfor %}
+
+                    {% elif field.field_type == "checkbox" %}
+                    <input type="checkbox" name="field_{{ field.id }}" value="1" {% if field.value %}checked{% endif %}>
+
+                    {% elif field.field_type == "file" %}
+                    <input type="file" name="field_{{ field.id }}" class="form-control">
+                    {% if field.value %}
+                    <small class="text-muted">Existing file: {{ field.value }}</small>
+                    {% endif %}
+
+                    {% elif field.field_type == "date" %}
+                    <input type="date" name="field_{{ field.id }}" value="{{ field.value }}" class="form-control">
+
+                    {% elif field.field_type == "email" %}
+                    <input type="email" name="field_{{ field.id }}" value="{{ field.value }}" class="form-control">
+
+                    
+                    {% elif field.field_type == "number" %}
+                    <input type="number" name="field_{{ field.id }}" value="{{ field.value }}" class="form-control">
+
+                    {% elif field.field_type == "tel" %}
+                    <input type="tel" name="field_{{ field.id }}" value="{{ field.value }}" class="form-control">
+
+                    {% else %}
+                    <input type="text" name="field_{{ field.id }}" value="{{ field.value }}" class="form-control">
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+
+                <div class="text-end">
+                    <button class="btn btn-success">Update</button>
+                    <a href="{% url 'view_entries' form_def.slug %}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

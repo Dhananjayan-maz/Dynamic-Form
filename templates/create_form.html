@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+{% block title %}Form Builder{% endblock %}
+
+{% block content %}
+
+<style>
+  .form-card {
+    background: linear-gradient(180deg, #9d5ddd);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
+  }
+
+  .field-row {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #f8ce5c;
+  }
+
+  .save-btn {
+    color: #8d4dce;
+    font-weight: 600;
+  }
+
+  .save-btn:hover {
+    background: linear-gradient(180deg, #a8b4eb, #8d4dce);
+    color: white;
+    border: none;
+  }
+
+  .btn-outline-light{
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+  }
+
+  .btn-outline-light:hover{
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border: none;
+  }
+
+  .add-btn:hover {
+    background: linear-gradient(180deg, #a8b4eb, #8d4dce);
+    color: white;
+    font-weight: 500;
+    border: none;
+  }
+
+  .choice-tag {
+    display: inline-block;
+    background: #e9ecef;
+    padding: .25rem .75rem;
+    border-radius: 50px;
+    margin: 3px;
+    font-size: .85rem;
+  }
+</style>
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+    <path
+      d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+  </symbol>
+</svg>
+
+<!-- Message Container -->
+<div class="message-container" id="messageContainer">
+  {% if messages %}
+  {% for message in messages %}
+  <div class="alert alert-danger alert-dismissible d-flex align-items-center" role="alert">
+    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+      <use xlink:href="#exclamation-triangle-fill" />
+    </svg>
+    <div>
+      <strong> {{message}} </strong>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
+
+
+<div class="container py-3">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+
+      <div class="form-card">
+        <h2 class="mb-4 text-white ">
+          <i class="bi bi-ui-checks"></i> Dynamic Form Builder
+        </h2>
+
+        <form id="formDefForm" method="post" action="{% url 'create_form' %}">
+          {% csrf_token %}
+
+          <!-- Form meta -->
+          <div class="mb-3">
+            <label class="form-label fw-bold text-white">Form Title</label>
+            <input type="text" name="title" class="form-control" required>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-bold text-white">Description</label>
+            <textarea name="description" class="form-control" rows="3"></textarea>
+          </div>
+
+          <hr class="text-light ">
+
+          <div id="fieldsContainer"></div>
+
+          <input type="hidden" name="fields_json" id="fields_json">
+
+          <div class="bottom-bar d-flex justify-content-between">
+            <button type="button" id="addFieldBtn" class="btn btn-outline-light btn-lg add-btn">
+              <i class="bi bi-plus-circle"></i> Add Field
+            </button>
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-light btn-lg save-btn ms-2">
+                <i class="bi bi-save"></i> Save Form
+              </button>
+
+              <a href="{% url 'entries_list' %}" class="btn btn-outline-light btn-lg cancel-btn">
+                <i class="bi bi-x-circle"></i> Cancel
+              </a>
+            </div>
+          </div>
+
+
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- FIELD TEMPLATE -->
+<template id="fieldTemplate">
+  <div class="field-row">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Label *</label>
+        <input type="text" class="form-control fld-label" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Field Type *</label>
+        <select class="form-select fld-type">
+          <option value="text">Text</option>
+          <option value="email">Email</option>
+          <option value="number">Number</option>
+          <option value="date">Date</option>
+          <option value="tel">Phone</option>
+          <option value="textarea">Textarea</option>
+          <option value="select">Select</option>
+          <option value="radio">Radio</option>
+          <option value="checkbox">Checkbox</option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Placeholder</label>
+        <input type="text" class="form-control fld-placeholder">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Default values</label>
+        <input type="text" class="form-control fld-default">
+      </div>
+
+      <div class="col-12 choices-wrapper d-none">
+        <label class="form-label">Choices (comma separated)</label>
+        <input type="text" class="form-control fld-choices">
+        <div class="choices-preview mt-2"></div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-check form-switch mt-4">
+          <input class="form-check-input fld-required" type="checkbox" checked>
+          <label class="form-check-label">Required</label>
+        </div>
+      </div>
+
+      <div class="col-md-6 text-end">
+        <button type="button" class="btn btn-sm btn-outline-danger removeBtn mt-4">
+          <i class="bi bi-trash"></i> Remove
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- JS -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+
+    const container = document.getElementById("fieldsContainer");
+    const addBtn = document.getElementById("addFieldBtn");
+    const template = document.getElementById("fieldTemplate");
+    const fieldsInput = document.getElementById("fields_json");
+
+    function addField() {
+      const clone = template.content.cloneNode(true);
+      const fieldRow = clone.querySelector(".field-row");
+
+      const typeSelect = fieldRow.querySelector(".fld-type");
+      const choicesWrapper = fieldRow.querySelector(".choices-wrapper");
+      const choicesInput = fieldRow.querySelector(".fld-choices");
+      const preview = fieldRow.querySelector(".choices-preview");
+
+      typeSelect.addEventListener("change", () => {
+        if (["select", "radio", "checkbox"].includes(typeSelect.value)) {
+          choicesWrapper.classList.remove("d-none");
+        } else {
+          choicesWrapper.classList.add("d-none");
+          preview.innerHTML = "";
+        }
+      });
+
+      choicesInput.addEventListener("input", () => {
+        const values = choicesInput.value.split(",").map(v => v.trim()).filter(Boolean);
+        preview.innerHTML = values.map(v => `<span class="choice-tag">${v}</span>`).join("");
+      });
+
+      fieldRow.querySelector(".removeBtn").addEventListener("click", () => {
+        fieldRow.remove();
+      });
+
+      container.appendChild(clone);
+    }
+
+    addBtn.addEventListener("click", addField);
+
+    document.getElementById("formDefForm").addEventListener("submit", () => {
+      const rows = [];
+
+      document.querySelectorAll(".field-row").forEach(row => {
+        rows.push({
+          label: row.querySelector(".fld-label").value,
+          field_type: row.querySelector(".fld-type").value,
+          placeholder: row.querySelector(".fld-placeholder").value,
+          default_value: row.querySelector(".fld-default").value,
+          choices: row.querySelector(".fld-choices")?.value || "",
+          required: row.querySelector(".fld-required").checked
+        });
+      });
+
+      fieldsInput.value = JSON.stringify(rows);
+    });
+
+    // Start with one field
+    addField();
+  });
+</script>
+
+{% endblock %}

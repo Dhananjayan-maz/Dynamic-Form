@@ -1,0 +1,504 @@
+{% extends 'base.html' %}
+{% block title %}{{ form_def.title }}{% endblock %}
+{% load form_extras %}
+
+{% block content %}
+
+<style>
+    body {
+        background-color: #f5f7fb;
+    }
+
+    .controls-bar {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 12px 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-box {
+        position: relative;
+    }
+
+    .search-box input {
+        padding-left: 40px;
+        border-radius: 30px;
+    }
+
+    .search-box i {
+        position: absolute;
+        top: 50%;
+        left: 14px;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+
+    .btn-add,
+    .btn-download {
+        border-radius: 30px;
+        padding: 0.6rem 1.4rem;
+        font-weight: 600;
+    }
+
+    .reg-btn {
+        background: linear-gradient(180deg, #a8b4eb, #8d4dce);
+        border: none;
+    }
+
+    .table thead th {
+        background: linear-gradient(180deg, #a8b4eb, #8d4dce);
+        color: white;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
+
+    /* ===== PDF PREVIEW STYLES ===== */
+    #pdfPreviewTable table {
+        margin: auto;
+        width: auto;
+    }
+
+    #pdfPreviewTable th,
+    #pdfPreviewTable td {
+        white-space: nowrap;
+    }
+
+    .input-compact {
+        width: 50px;
+    }
+
+    .input-compact-number {
+        width: 70px;
+    }
+
+    .input-compact-select {
+        width: 100px;
+    }
+</style>
+
+<div class="container-fluid px-4 py-4">
+
+    <h4 class="fw-bold mb-3">{{ form_def.title }} – Registered Participants</h4>
+
+    <!-- ================= CONTROLS ================= -->
+    <div class="controls-bar d-flex gap-2 align-items-center mb-3">
+
+        <div class="search-box flex-grow-1">
+            <i class="bi bi-search"></i>
+            <input type="text" id="tableSearch" class="form-control" placeholder="Search registrations...">
+        </div>
+
+        <a href="{% url 'register_form' form_def.slug %}" class="btn btn-primary btn-add reg-btn">
+            Add Registration
+        </a>
+
+        <div class="btn-group">
+            <button class="btn btn-primary btn-download dropdown-toggle" data-bs-toggle="dropdown">
+                Download
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" id="downloadExcel">📊 Excel</a></li>
+                <li><a class="dropdown-item" id="previewPDF">👁 Preview PDF</a></li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- ================= TABLE ================= -->
+    <div class="table-responsive">
+        <table id="entriesTable" class="table table-bordered table-hover align-middle bg-white table-striped">
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    {% for field in fields %}
+                    <th>{{ field.label }}</th>
+                    {% endfor %}
+                    <th>Submitted At</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for entry in entries %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    {% for field in fields %}
+                    <td>{{ entry.data|get_item:field.key|default:"—" }}</td>
+                    {% endfor %}
+                    <td>{{ entry.submitted_at|date:"d M Y, h:i A" }}</td>
+                    <td>
+                        <a href="{% url 'update_register' form_def.slug entry.id %}"
+                            class="btn btn-sm btn-outline-primary">Edit</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- ================= PDF PREVIEW MODAL ================= -->
+<div class="modal fade" id="pdfPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">PDF Preview</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- ===== PDF SETTINGS ===== -->
+                <div class="card mb-3">
+                    <div class="card-header fw-bold">PDF Export Settings</div>
+
+                    <div
+                        class="card-body d-flex flex-wrap flex-lg-nowrap align-items-center justify-content-evenly gap-3">
+
+                        <div class="col-auto">
+                            <label>Show Borders</label>
+                            <select id="pdfBorders" class="form-select input-compact input-compact-select">
+                                <option value="true" selected>Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+
+                        <div class="col-auto">
+                            <label>Header Color</label>
+                            <input type="color" id="pdfHeaderColor" value="#8d4dce"
+                                class="form-control form-control-color input-compact">
+                        </div>
+
+                        <div class="col-auto">
+                            <label>Header Font Color</label>
+                            <input type="color" id="pdfHeaderFontColor" value="#ffffff"
+                                class="form-control form-control-color input-compact">
+                        </div>
+
+                        <div class="col-auto">
+                            <label>Header Font</label>
+                            <input type="number" id="pdfHeaderFont" class="form-control input-compact-number"
+                                value="11">
+                        </div>
+
+                        <div class="col-auto">
+                            <label>Body Font</label>
+                            <input type="number" id="pdfBodyFont" class="form-control input-compact-number" value="8">
+                        </div>
+
+                        <div class="col-auto">
+                            <label>Alignment</label>
+                            <select id="pdfAlignment" class="form-select input-compact input-compact-select">
+                                <option value="center" selected>Center</option>
+                                <option value="left">Left</option>
+                                <option value="right">Right</option>
+                            </select>
+                        </div>
+
+                        <div class="col-auto">
+                            <label>Cell Padding</label>
+                            <input type="number" id="pdfPadding" class="form-control input-compact-number" value="4">
+                        </div>
+
+                        <div class="col-auto">
+                            <label>Orientation</label>
+                            <select id="pdfOrientation" class="form-select input-compact-select">
+                                <option value="landscape" selected>Landscape</option>
+                                <option value="portrait">Portrait</option>
+                            </select>
+                        </div>
+
+
+                    </div>
+                </div>
+
+
+                <!-- ===== PREVIEW TABLE ===== -->
+                <div id="pdfPreviewTable" class="table-responsive border rounded p-3 bg-white"></div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-primary" id="downloadFinalPDF">Download PDF</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+
+    $(document).ready(function () {
+
+        function getPdfSettings() {
+            return {
+                showBorders: $('#pdfBorders').val() === 'true',
+                headerColor: $('#pdfHeaderColor').val(),
+                headerFontColor: $('#pdfHeaderFontColor').val(),
+                headerFont: parseInt($('#pdfHeaderFont').val()),
+                bodyFont: parseInt($('#pdfBodyFont').val()),
+                alignment: $('#pdfAlignment').val(),
+                padding: parseInt($('#pdfPadding').val()),
+                orientation: $('#pdfOrientation').val(),
+            };
+        }
+
+        const table = $('#entriesTable').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            dom: 'Brtip',
+
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    className: 'd-none',
+                    exportOptions: {
+                        columns: ':not(:nth-last-child(-n+2))'
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    orientation: 'landscape',
+                    pageSize: 'A4',
+                    className: 'd-none',
+                    exportOptions: {
+                        columns: ':not(:nth-last-child(-n+2))'
+                    },
+                    customize: function (doc) {
+
+                        const s = getPdfSettings();
+                        const tableObj = doc.content[1];
+                        const body = tableObj.table.body;
+
+                        /* ================= PAGE & ALIGNMENT ================= */
+                        doc.pageOrientation = s.orientation;
+                        doc.pageMargins = [20, 30, 20, 20];
+
+                        tableObj.alignment = 'center';
+                        tableObj.margin = [0, 5, 0, 0];
+
+                        /* ================= SMART LAYOUT ================= */
+                        tableObj.layout = {
+                            hLineWidth: () => s.showBorders ? 1 : 0,
+                            vLineWidth: () => s.showBorders ? 1 : 0,
+
+                            /* ===== DYNAMIC CELL PADDING ===== */
+                            paddingLeft: function (i) {
+                                if (i === 0) return 3; // S.No column (very small)
+                                return 6;
+                            },
+                            paddingRight: function (i) {
+                                if (i === 0) return 3;
+                                return 6;
+                            },
+                            paddingTop: () => s.padding,
+                            paddingBottom: () => s.padding
+                        };
+
+                        /* ================= STYLES ================= */
+                        doc.styles.tableHeader = {
+                            bold: true,
+                            fontSize: s.headerFont,
+                            fillColor: s.headerColor,
+                            color: s.headerFontColor,
+                            alignment: 'center'
+                        };
+
+                        doc.defaultStyle.fontSize = s.bodyFont;
+                        doc.defaultStyle.alignment = s.alignment;
+
+                        /* ================= SAFE COLUMN WIDTH ENGINE ================= */
+
+                        const pageWidth = s.orientation === 'portrait' ? 515 : 770;
+                        const colCount = body[0].length;
+
+                        // 1️⃣ Define column priorities
+                        const MIN_WIDTH = 30;
+                        const MAX_WIDTH = 180;
+
+                        let colWidths = [];
+                        let totalWidth = 0;
+
+                        for (let c = 0; c < colCount; c++) {
+
+                            let headerText = body[0][c].text || '';
+                            let maxContent = headerText.length;
+
+                            for (let r = 1; r < body.length; r++) {
+                                maxContent = Math.max(
+                                    maxContent,
+                                    (body[r][c].text || '').length
+                                );
+                            }
+
+                            let width;
+
+                            // S.No → very small
+                            if (c === 0) {
+                                width = 30;
+                            }
+                            // Gender → fixed safe width
+                            else if (headerText.toLowerCase().includes('gender')) {
+                                width = 60;
+                            }
+                            // Email → capped width
+                            else if (headerText.toLowerCase().includes('email')) {
+                                width = 140;
+                            }
+                            // Phone
+                            else if (headerText.toLowerCase().includes('phone')) {
+                                width = 110;
+                            }
+                            // Default auto
+                            else {
+                                width = Math.min(
+                                    MAX_WIDTH,
+                                    Math.max(70, maxContent * 5) 
+                                );
+                            }
+
+                            width = Math.max(width, MIN_WIDTH);
+
+                            colWidths.push(width);
+                            totalWidth += width;
+                        }
+
+                        // 2️⃣ Scale if overflow (PRESERVE ALL COLUMNS)
+                        if (totalWidth > pageWidth) {
+                            const scale = pageWidth / totalWidth;
+                            colWidths = colWidths.map(w =>
+                                Math.max(MIN_WIDTH, Math.round(w * scale))
+                            );
+                        }
+
+                        // 3️⃣ APPLY
+                        tableObj.table.widths = colWidths;
+
+
+                        /* ================= FIT TO PAGE (PREVENT GENDER LOSS) ================= */
+                        if (totalWidth > pageWidth) {
+                            const scale = pageWidth / totalWidth;
+                            colWidths = colWidths.map(w => Math.floor(w * scale));
+                        }
+
+                        tableObj.table.widths = colWidths;
+                    }
+                }
+            ]
+        });
+
+        $('#tableSearch').on('keyup', function () {
+            table.search(this.value).draw();
+        });
+
+        $('#downloadExcel').click(() => table.button('.buttons-excel').trigger());
+
+        $('#previewPDF').on('click', function () {
+
+            const dt = $('#entriesTable').DataTable();
+
+            // Create table structure
+            let html = `<table class="table table-bordered">
+                    <thead><tr>`;
+
+            // Headers (remove last 2 columns)
+            $('#entriesTable thead th').each(function (i, th) {
+                if (i < $('#entriesTable thead th').length - 2) {
+                    html += `<th>${$(th).text()}</th>`;
+                }
+            });
+
+            html += `</tr></thead><tbody>`;
+
+            // ALL ROWS (not just current page)
+            dt.rows({ search: 'applied' }).every(function () {
+                const row = this.data();
+                html += '<tr>';
+
+                for (let i = 0; i < row.length - 2; i++) {
+                    html += `<td>${row[i]}</td>`;
+                }
+
+                html += '</tr>';
+            });
+
+            html += `</tbody></table>`;
+
+            $('#pdfPreviewTable').html(html);
+
+            applyPreviewStyles();
+
+            $('#pdfPreviewModal').modal('show');
+        });
+
+        /* LIVE UPDATE PREVIEW ON CHANGE */
+        $('#pdfPreviewModal').on('input change', 'input, select', function () {
+            applyPreviewStyles();
+        });
+
+        $('#pdfPreviewModal').on('shown.bs.modal', function () {
+            /* Re-apply styles on modal show to fix any rendering issues */
+            applyPreviewStyles();
+        });
+
+        $('#downloadFinalPDF').click(() => table.button('.buttons-pdf').trigger());
+
+        function applyPreviewStyles() {
+
+            const s = {
+                showBorders: $('#pdfBorders').val() === 'true',
+                headerColor: $('#pdfHeaderColor').val(),
+                headerFontColor: $('#pdfHeaderFontColor').val(),
+                headerFont: parseInt($('#pdfHeaderFont').val()),
+                bodyFont: parseInt($('#pdfBodyFont').val()),
+                alignment: $('#pdfAlignment').val(),
+                padding: parseInt($('#pdfPadding').val()),
+                orientation: $('#pdfOrientation').val()
+            };
+
+            const table = $('#pdfPreviewTable table');
+            const container = $('#pdfPreviewTable');
+
+            /* ===== PREVIEW PAGE SIZE EFFECT ===== */
+            if (s.orientation === 'portrait') {
+                container.css({
+                    'max-width': '850px',
+                    'margin': '0 auto'
+                });
+            } else {
+                container.css({
+                    'max-width': '1200px',
+                    'margin': '0 auto'
+                });
+            }
+
+            /* Center table */
+            table.css({ margin: '0 auto' });
+
+            /* Borders */
+            table.find('th, td').css({
+                'border': s.showBorders ? '1px solid #333' : 'none',
+                'padding': s.padding + 'px',
+                'text-align': s.alignment,
+                'font-size': s.bodyFont + 'px'
+            });
+
+            /* Header styling */
+            table.find('thead th').css({
+                'background': s.headerColor,
+                'color': s.headerFontColor,
+                'font-size': s.headerFont + 'px',
+                'font-weight': 'bold',
+                'text-align': 'center'
+            });
+        }
+
+    });
+</script>
+{% endblock %}
+{% endblock %}

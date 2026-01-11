@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% block title %}{{ form_def.title }} - Registration{% endblock %}
+{% load form_extras %}
+
+{% block content %}
+
+<style>
+  .register-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 2.5rem;
+    margin: 1.5rem;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, .25);
+    animation: fadeUp 0.6s ease;
+  }
+
+  .header {
+    background: linear-gradient(180deg, #a8b4eb, #8d4dce);
+    position: relative;
+    border-radius: 20px;
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .reg-btn {
+    background: linear-gradient(135deg, #D8BFD8, #662d91);
+    border: none;
+    color: white;
+  }
+
+  .form-title {
+    font-weight: 700;
+    color: white;
+  }
+
+  .form-description {
+    font-weight: 500;
+    color: #eef2f3;
+    padding-bottom: 10px;
+  }
+
+  .form-control,
+  .form-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+    transition: all .2s ease;
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    border-color: #764ba2;
+    box-shadow: none;
+  }
+
+  .form-check-input {
+    cursor: pointer;
+  }
+
+  .required-star {
+    color: #dc3545;
+  }
+
+  button[type="submit"] {
+    border-radius: 14px;
+    padding: 0.85rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+</style>
+
+<!-- Message Container -->
+<div class="message-container" id="messageContainer">
+  {% if messages %}
+  {% for message in messages %}
+  <div class="alert alert-danger alert-dismissible d-flex align-items-center" role="alert">
+    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+      <use xlink:href="#exclamation-triangle-fill" />
+    </svg>
+    <div>
+      <strong> {{message}} </strong>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-md-9">
+
+      <div class="register-card">
+
+        <!-- Header -->
+        <div class="text-center mb-4 p-1 header">
+          <i class="bi bi-clipboard-check display-5 text-light"></i>
+          <h2 class="form-title mt-2">{{ form_def.title }}</h2>
+          <p class="form-description">{{ form_def.description }}</p>
+        </div>
+
+        <!-- Form -->
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {% for field in form %}
+          <div class="mb-4">
+
+            <label class="form-label fw-semibold">
+              {{ field.label }}
+              {% if field.field.required %}
+              <span class="required-star">*</span>
+              {% endif %}
+            </label>
+
+            <!-- RADIO -->
+            {% if field.field.widget|class_name == "RadioSelect" %}
+            <div class="mt-2">
+              {% for radio in field %}
+              <div class="form-check mb-2">
+                {{ radio.tag }}
+                <label class="form-check-label ms-2">
+                  {{ radio.choice_label }}
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+
+            <!-- CHECKBOX MULTIPLE -->
+            {% elif field.field.widget|class_name == "CheckboxSelectMultiple" %}
+            <div class="mt-2">
+              {% for checkbox in field %}
+              <div class="form-check mb-2">
+                {{ checkbox.tag }}
+                <label class="form-check-label ms-2">
+                  {{ checkbox.choice_label }}
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+
+            <!-- SELECT -->
+            {% elif field.field.widget.input_type == "select" %}
+            {{ field|add_class:"form-select" }}
+
+            <!-- NORMAL INPUT -->
+            {% else %}
+            {{ field|add_class:"form-control" }}
+            {% endif %}
+
+            {% if field.help_text %}
+            <div class="form-text">{{ field.help_text }}</div>
+            {% endif %}
+
+            {% for error in field.errors %}
+            <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+          {% endfor %}
+
+          <div class="d-grid mt-4">
+            <button type="submit" class="reg-btn">
+              <i class="bi bi-send"></i> Register
+            </button>
+          </div>
+
+          <div class="d-flex justify-content-evenly mt-4">
+            <a href="{% url 'view_entries' form_def.slug %}" class="btn btn-outline-primary btn-lg">
+              <i class="bi bi-box-arrow-right"></i> View Registrations
+            </a>
+            <a href="{% url 'entries_list' %}" class="btn btn-outline-danger btn-lg ms-4">
+              <i class="bi bi-x-circle"></i> Cancel
+            </a>
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

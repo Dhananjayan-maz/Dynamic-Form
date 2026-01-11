@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Up | Dynamic Forms</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fb 0%, #eef1fa 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .signup-container {
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .signup-card {
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(141, 77, 206, 0.2);
+            border: none;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .left-panel {
+            background: linear-gradient(135deg, #a8b4eb 0%, #8d4dce 100%);
+            color: white;
+            padding: 40px 35px;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, transparent 65%, rgba(255,255,255,0.1) 75%, transparent 85%),
+                linear-gradient(-45deg, transparent 65%, rgba(255,255,255,0.1) 75%, transparent 85%);
+            background-size: 50px 50px;
+            animation: slideDiagonal 20s linear infinite;
+            opacity: 0.3;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo i {
+            font-size: 24px;
+            animation: bounce 2s infinite;
+        }
+
+        .left-panel h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            line-height: 1.4;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Zigzag Feature Cards Layout */
+        .features-zigzag {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .feature-row {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .feature-row:nth-child(odd) .feature-card:first-child {
+            margin-right: auto;
+            animation: slideInLeft 0.6s ease-out forwards;
+        }
+
+        .feature-row:nth-child(odd) .feature-card:last-child {
+            margin-left: auto;
+            animation: slideInRight 0.6s ease-out forwards;
+        }
+
+        .feature-row:nth-child(even) .feature-card:first-child {
+            margin-left: auto;
+            animation: slideInRight 0.6s ease-out forwards;
+        }
+
+        .feature-row:nth-child(even) .feature-card:last-child {
+            margin-right: auto;
+            animation: slideInLeft 0.6s ease-out forwards;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 48%;
+            opacity: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px) scale(1.03);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        .feature-card:hover::after {
+            opacity: 1;
+            animation: shimmer 1.5s;
+        }
+
+        .feature-card i {
+            background: rgba(255, 255, 255, 0.2);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover i {
+            transform: rotate(15deg) scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .feature-card h6 {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+            line-height: 1.3;
+        }
+
+        .feature-card p {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 0;
+            line-height: 1.4;
+        }
+
+        .right-panel {
+            padding: 40px 35px;
+            background: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, #8d4dce, #a8b4eb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .form-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #8d4dce, #a8b4eb);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 14px 15px 14px 45px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .form-control:focus {
+            border-color: #8d4dce;
+            box-shadow: 0 0 0 3px rgba(141, 77, 206, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .form-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8d4dce;
+            font-size: 18px;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus + .form-icon {
+            color: #a8b4eb;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .btn-signup {
+            background: linear-gradient(90deg, #8d4dce, #a8b4eb);
+            border: none;
+            color: white;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+            font-size: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-signup:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(141, 77, 206, 0.25);
+            color: white;
+        }
+
+        .btn-signup::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        .btn-signup:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #8d4dce;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: #a8b4eb;
+            text-decoration: underline;
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            margin-bottom: 25px;
+            padding: 12px 15px;
+            font-size: 14px;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        /* Zigzag connecting lines */
+        .zigzag-line {
+            position: absolute;
+            height: 30px;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            right: 50%;
+            transform: translateX(50%);
+            z-index: 1;
+        }
+
+        .zigzag-line:nth-child(1) {
+            top: 45%;
+            animation: linePulse 2s infinite;
+        }
+
+        .zigzag-line:nth-child(2) {
+            top: 70%;
+            animation: linePulse 2s infinite 0.5s;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px) rotate(-5deg); }
+            to { opacity: 1; transform: translateX(0) rotate(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px) rotate(5deg); }
+            to { opacity: 1; transform: translateX(0) rotate(0); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes shimmer {
+            0% { transform: rotate(45deg) translateX(-50%) translateY(-50%); }
+            100% { transform: rotate(45deg) translateX(50%) translateY(50%); }
+        }
+
+        @keyframes slideDiagonal {
+            0% { background-position: 0 0, 0 0; }
+            100% { background-position: 50px 50px, -50px -50px; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+            20%, 40%, 60%, 80% { transform: translateX(3px); }
+        }
+
+        @keyframes linePulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 1;
+            }
+            20% {
+                transform: scale(25, 25);
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(40, 40);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .signup-card {
+                margin: 15px;
+            }
+            
+            .left-panel,
+            .right-panel {
+                padding: 35px 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .signup-container {
+                padding: 15px;
+            }
+            
+            .signup-card {
+                border-radius: 20px;
+            }
+            
+            .left-panel,
+            .right-panel {
+                padding: 30px 25px;
+            }
+            
+            .logo {
+                font-size: 20px;
+                margin-bottom: 25px;
+            }
+            
+            .left-panel h2 {
+                font-size: 20px;
+                margin-bottom: 25px;
+            }
+            
+            .form-title {
+                font-size: 24px;
+                margin-bottom: 25px;
+            }
+            
+            .feature-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .feature-card {
+                width: 100% !important;
+                margin: 0 !important;
+                animation: slideInUp 0.6s ease-out forwards !important;
+            }
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 576px) {
+            .signup-card {
+                border-radius: 15px;
+            }
+            
+            .left-panel,
+            .right-panel {
+                padding: 25px 20px;
+            }
+            
+            .features-zigzag {
+                gap: 15px;
+            }
+            
+            .feature-card {
+                padding: 15px;
+            }
+            
+            .feature-card i {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+                margin-bottom: 10px;
+            }
+            
+            .form-control,
+            .btn-signup {
+                padding: 12px 12px 12px 45px;
+            }
+        }
+
+        /* No scrolling design */
+        html, body {
+            max-height: 100vh;
+            overflow-y: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div class="signup-container">
+    <div class="card signup-card">
+        <div class="row g-0">
+            <!-- Left Column: Features Zigzag -->
+            <div class="col-lg-6 d-none d-lg-block">
+                <div class="left-panel">
+                    <div class="zigzag-line"></div>
+                    <div class="zigzag-line"></div>
+                    
+                    <div class="logo">
+                        <i class="bi bi-layout-text-window-reverse"></i>
+                        DynamicForms
+                    </div>
+                    
+                    <h2>
+                        Join Thousands of Creating Amazing Forms.
+                        Start your journey today!
+                    </h2>
+                    
+                    <div class="features-zigzag">
+                        <!-- Row 1 -->
+                        <div class="feature-row">
+                            <div class="feature-card" style="animation-delay: 0.1s">
+                                <i class="bi bi-rocket-takeoff"></i>
+                                <h6>Quick Setup</h6>
+                                <p>Get started in minutes with our intuitive form builder</p>
+                            </div>
+                            
+                            <div class="feature-card" style="animation-delay: 0.3s">
+                                <i class="bi bi-shield-check"></i>
+                                <h6>Secure & Reliable</h6>
+                                <p>Your data is protected with enterprise-grade security</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Row 2 -->
+                        <div class="feature-row">
+                            <div class="feature-card" style="animation-delay: 0.5s">
+                                <i class="bi bi-people"></i>
+                                <h6>Team Collaboration</h6>
+                                <p>Invite team members and work together seamlessly</p>
+                            </div>
+                            
+                            <div class="feature-card" style="animation-delay: 0.7s">
+                                <i class="bi bi-graph-up-arrow"></i>
+                                <h6>Advanced Analytics</h6>
+                                <p>Gain insights with built-in analytics and reports</p>
+                            </div>
+                        </div>
+                        
+                       
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: Signup Form -->
+            <div class="col-lg-6">
+                <div class="right-panel">
+                    <h1 class="form-title">Create Account</h1>
+                    
+                    {% for message in messages %}
+                        <div class="alert alert-danger">{{ message }}</div>
+                    {% endfor %}
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <i class="bi bi-person form-icon"></i>
+                            <input type="text" name="username" class="form-control" placeholder="Username" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <i class="bi bi-envelope form-icon"></i>
+                            <input type="email" name="email" class="form-control" placeholder="Email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <i class="bi bi-lock form-icon"></i>
+                            <input type="password" name="password" class="form-control" placeholder="Password" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <i class="bi bi-lock-fill form-icon"></i>
+                            <input type="password" name="confirm" class="form-control" placeholder="Confirm Password" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-signup">
+                            <i class="bi bi-person-plus me-2"></i>
+                            Create Account
+                        </button>
+                    </form>
+                    
+                    <div class="login-link">
+                        <p class="mb-0">
+                            Already have an account?
+                            <a href="{% url 'login' %}" class="ms-1">Login here</a>
+                        </p>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Add interactive form effects
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('.form-control');
+        const form = document.querySelector('form');
+        
+        inputs.forEach(input => {
+            // Add focus/blur effects
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('focused');
+            });
+            
+            input.addEventListener('blur', function() {
+                if (this.value === '') {
+                    this.parentElement.classList.remove('focused');
+                }
+            });
+            
+            // Add typing animation
+            input.addEventListener('input', function() {
+                if (this.value.length > 0) {
+                    this.style.background = 'rgba(141, 77, 206, 0.03)';
+                } else {
+                    this.style.background = '';
+                }
+            });
+        });
+        
+        // Add form submission animation
+        form.addEventListener('submit', function(e) {
+            const submitBtn = document.querySelector('.btn-signup');
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Creating Account...';
+            submitBtn.disabled = true;
+        });
+    });
+</script>
+
+</body>
+</html>

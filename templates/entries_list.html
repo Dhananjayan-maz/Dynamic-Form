@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% block title %}Your Forms{% endblock %}
+
+{% block content %}
+
+<style>
+    .create-btn {
+        background: linear-gradient(180deg, #a8b4eb, #8d4dce);
+        color: white;
+        padding: 0.6rem;
+        border-radius: 20px;
+        border: none;
+    }
+
+    .create-btn:hover {
+        background: linear-gradient(180deg, #8d4dce, #a8b4eb);
+        color: white;
+    }
+
+    /* Container Animation */
+    .d-flex.justify-content-between.align-items-center.mb-4 {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Title Animation */
+    h4.fw-bold {
+        color: #8d4dce;
+        transition: all 0.3s ease;
+        position: relative;
+        display: inline-block;
+    }
+
+    h4.fw-bold:hover {
+        color: #a8b4eb;
+        transform: translateY(-2px);
+    }
+
+    h4.fw-bold::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #8d4dce, #a8b4eb);
+        transition: width 0.3s ease;
+    }
+
+    h4.fw-bold:hover::after {
+        width: 100%;
+    }
+
+    /* Create Button Animation */
+    a.btn.create-btn {
+        background: linear-gradient(90deg, #8d4dce, #a8b4eb);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(141, 77, 206, 0.2);
+    }
+
+    a.btn.create-btn i {
+        transition: transform 0.3s ease;
+    }
+
+    a.btn.create-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(141, 77, 206, 0.3);
+        background: linear-gradient(90deg, #a8b4eb, #8d4dce);
+    }
+
+    a.btn.create-btn:hover i {
+        transform: rotate(90deg);
+    }
+
+    /* Simple fade-in animation */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .d-flex.justify-content-between.align-items-center.mb-4 {
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+
+        h4.fw-bold::after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    }
+</style>
+
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="actionToast" class="toast align-items-center text-bg-success border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+
+<form id="csrf-form">
+    {% csrf_token %}
+</form>
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold">Your Forms</h4>
+        <a href="{% url 'create_form' %}" class="btn create-btn">
+            <i class="bi bi-plus-circle me-1"></i> Create New Form
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>S.No</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th class="text-center">View</th>
+                    <th class="text-center">Delete</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for form in user_forms %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="fw-semibold">{{ form.title }}</td>
+                    <td class="text-muted">
+                        {{ form.description|default:"—" }}
+                    </td>
+
+                    <!-- VIEW -->
+                    <td class="text-center">
+                        <a href="{% url 'view_entries' form.slug %}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i> View
+                        </a>
+                    </td>
+
+                    <!-- DELETE -->
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-outline-danger delete-btn"
+                            data-form-id="{{ form.id }}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">
+                        No forms created yet
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">
+                    Confirm Delete
+                </h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                Are you sure you want to delete this form?
+                <br>
+                <small class="text-muted">This action cannot be undone.</small>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button class="btn btn-danger" id="confirmDelete">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let deleteFormId = null;
+    let deleteModal = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+        deleteModal = new bootstrap.Modal(
+            document.getElementById("deleteModal")
+        );
+
+        document.addEventListener("click", e => {
+            const btn = e.target.closest(".delete-btn");
+            if (!btn) return;
+
+            e.preventDefault();
+
+            deleteFormId = btn.dataset.formId;
+            console.log("DELETE CLICKED ID:", deleteFormId);
+
+            deleteModal.show();
+        });
+
+        document.getElementById("confirmDelete").addEventListener("click", () => {
+            fetch(`/forms/${deleteFormId}/delete/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": document.querySelector(
+                        "input[name=csrfmiddlewaretoken]"
+                    ).value
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast("Form deleted successfully");
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        showToast("Delete failed", true);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Something went wrong");
+                });
+        });
+
+        function showToast(message, isError = false) {
+            const toastEl = document.getElementById("actionToast");
+            const toastMsg = document.getElementById("toastMessage");
+
+            toastMsg.innerText = message;
+            toastEl.classList.toggle("text-bg-danger", isError);
+            toastEl.classList.toggle("text-bg-success", !isError);
+
+            new bootstrap.Toast(toastEl).show();
+        }
+
+
+    });
+</script>
+
+
+
+{% endblock %}

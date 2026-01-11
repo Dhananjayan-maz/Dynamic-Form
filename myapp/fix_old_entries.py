@@ -21,5 +21,3 @@ def run():
 
         entry.data = new_data
         entry.save()
-
-    print("✅ Old entries fixed successfully")

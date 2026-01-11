@@ -167,7 +167,8 @@ dynamic/
 ## Installation & Setup
 ### 1.Clone the Repository
 git clone https://github.com/Dhananjayan-maz/Dynamic-Form.git
-cd Dynamic-Form
+
+cd dynamic
 
 ### 2.Create Virtual Environment
 python -m venv venv

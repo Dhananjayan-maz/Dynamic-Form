@@ -71,8 +71,6 @@ Live PDF preview
 
 PDF customization:
 
-Font family
-
 Font size
 
 Header color
@@ -93,7 +91,7 @@ Bootstrap Icons
 
 Clean dashboard layout
 
-## Project Folder
+## Project Folder Structure 
 
 dynamic/
 

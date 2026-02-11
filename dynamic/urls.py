@@ -34,7 +34,7 @@ urlpatterns = [
     path('signup/', views.signup_view, name='signup'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
-    path('home/', views.home_view, name='home'),
+    path('', views.home_view, name='home'),
     path("forms/<int:id>/delete/", views.delete_form, name="delete_form"),
     path( "entries/update/<slug:slug>/<int:entry_id>/", views.update_register,name="update_register"),
 

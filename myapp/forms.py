@@ -6,7 +6,7 @@ from datetime import date, datetime
 def build_dynamic_form(form_definition):
 
     class DynamicRegistrationForm(forms.Form):
-        pass
+        pass 
 
     for ff in form_definition.fields.all():
 

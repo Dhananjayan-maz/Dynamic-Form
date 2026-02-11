@@ -218,8 +218,8 @@ def update_register(request, slug, entry_id):
 
 def signup_view(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        email = request.POST['email']
+        username = request.POST['username'].strip()
+        email = request.POST['email'].strip()
         password = request.POST['password']
         confirm = request.POST['confirm']
 
@@ -245,8 +245,8 @@ def signup_view(request):
 
 def login_view(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST['username'].strip()
+        password = request.POST['password'].strip()
 
         user = authenticate(request, username=username, password=password)
 

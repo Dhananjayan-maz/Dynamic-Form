@@ -30,12 +30,12 @@
     border: none;
   }
 
-  .btn-outline-light{
+  .btn-outline-light {
     background: rgba(255, 255, 255, 0.15);
     color: #fff;
   }
 
-  .btn-outline-light:hover{
+  .btn-outline-light:hover {
     background: rgba(255, 255, 255, 0.15);
     color: #fff;
     border: none;
@@ -111,13 +111,31 @@
 
           <input type="hidden" name="fields_json" id="fields_json">
 
-          <div class="bottom-bar d-flex justify-content-between">
+          <div class="bottom-bar d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3 mt-4">
+            <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
+
+              <button type="button" id="addFieldBtn" class="btn btn-outline-light btn-lg add-btn w-100 w-md-auto">
+                <i class="bi bi-plus-circle"></i> Add Field
+              </button>
+
+              <button type="submit" class="btn btn-light btn-lg save-btn w-100">
+                <i class="bi bi-save"></i> Save Form
+              </button>
+
+              <a href="{% url 'entries_list' %}" class="btn btn-outline-light btn-lg cancel-btn w-100">
+                <i class="bi bi-x-circle"></i> Cancel
+              </a>
+            </div>
+          </div>
+
+
+          <!-- <div class="bottom-bar d-flex justify-content-between">
             <button type="button" id="addFieldBtn" class="btn btn-outline-light btn-lg add-btn">
               <i class="bi bi-plus-circle"></i> Add Field
-            </button>
+            </button> -->
 
-            <!-- Action Buttons -->
-            <div class="d-flex gap-2">
+          <!-- Action Buttons -->
+          <!-- <div class="d-flex gap-2">
               <button type="submit" class="btn btn-light btn-lg save-btn ms-2">
                 <i class="bi bi-save"></i> Save Form
               </button>
@@ -126,7 +144,7 @@
                 <i class="bi bi-x-circle"></i> Cancel
               </a>
             </div>
-          </div>
+          </div> -->
 
 
         </form>

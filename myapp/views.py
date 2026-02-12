@@ -236,7 +236,6 @@ def signup_view(request):
             email=email,
             password=password
         )
-        messages.success(request, "Account created successfully")
         return redirect('login')
 
     return render(request, 'signup.html')

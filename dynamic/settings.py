@@ -38,6 +38,8 @@ RENDER_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_HOSTNAME) 
 
+# Optional local development hosts
+ALLOWED_HOSTS += ['localhost', '127.0.0.1']
 
 # Application definition
 

@@ -478,7 +478,6 @@
 
     <!-- ================= NAVBAR ================= -->
     <nav class="navbar navbar-expand-lg">
-        <div class="navbar-overlay"></div>
         <a class="navbar-brand fw-bold" href="{% url 'home' %}">
             DynamicForms
         </a>
@@ -527,6 +526,7 @@
         </div>
 
     </nav>
+    <div class="navbar-overlay"></div>
 
     <!-- ================= MAIN CONTENT ================= -->
     <main class="main-content">
@@ -574,56 +574,55 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        let deleteFormId = null;
-        const deleteModal = new bootstrap.Modal(
-            document.getElementById("deleteConfirmModal")
-        );
 
-        document.addEventListener("click", function (e) {
-            const btn = e.target.closest(".delete-form-btn");
-            if (btn) {
-                deleteFormId = btn.dataset.formId;
-                deleteModal.show();
-            }
-        });
 
-        document.getElementById("confirmDeleteBtn").onclick = () => {
-            fetch(`/forms/${deleteFormId}/delete/`, {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": document.body.dataset.csrf,
-                    "X-Requested-With": "XMLHttpRequest"
-                }
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.href = "{% url 'create_form' %}";
-                    }
+        // ===== MOBILE NAVBAR FIX =====
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const navCollapse = document.getElementById("navMenu");
+            const overlay = document.querySelector(".navbar-overlay");
+            const mobileCloseBtn = document.querySelector(".mobile-close-btn");
+
+            if (!navCollapse) return;
+
+            const bsCollapse = new bootstrap.Collapse(navCollapse, {
+                toggle: false
+            });
+
+            // ✅ Force close on refresh
+            bsCollapse.hide();
+            overlay.classList.remove("active");
+            document.body.style.overflow = "";
+
+            navCollapse.addEventListener("shown.bs.collapse", function () {
+                overlay.classList.add("active");
+                document.body.style.overflow = "hidden";
+            });
+
+            navCollapse.addEventListener("hidden.bs.collapse", function () {
+                overlay.classList.remove("active");
+                document.body.style.overflow = "";
+            });
+
+            overlay.addEventListener("click", function () {
+                bsCollapse.hide();
+            });
+
+            if (mobileCloseBtn) {
+                mobileCloseBtn.addEventListener("click", function () {
+                    bsCollapse.hide();
                 });
-        };
+            }
 
-        // ===== MOBILE RIGHT SLIDE CONTROL =====
-        const navToggler = document.querySelector(".navbar-toggler");
-        const navCollapse = document.getElementById("navMenu");
-        const overlay = document.querySelector(".navbar-overlay");
+            document.querySelectorAll(".navbar-nav .nav-link").forEach(link => {
+                link.addEventListener("click", function () {
+                    bsCollapse.hide();
+                });
+            });
 
-        navToggler.addEventListener("click", function () {
-            overlay.classList.toggle("active");
         });
 
-        overlay.addEventListener("click", function () {
-            navCollapse.classList.remove("show");
-            overlay.classList.remove("active");
-        });
-
-        // Close button inside mobile menu
-        const mobileCloseBtn = document.querySelector(".mobile-close-btn");
-
-        mobileCloseBtn.addEventListener("click", function () {
-            navCollapse.classList.remove("show");
-            overlay.classList.remove("active");
-        });
 
     </script>
 

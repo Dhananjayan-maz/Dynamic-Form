@@ -1,6 +1,6 @@
 asgiref==3.11.0
 dj-database-url==3.1.0
-Django==6.0
+Django==5.2.7
 django-browser-reload==1.21.0
 dotenv==0.9.9
 gunicorn==25.0.3
